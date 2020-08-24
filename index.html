@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" >
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    <style>
+        *{
+            text-align: center;
+        }
+        p{
+            text-align: left;
+        }
+
+        #showAllCountries{
+            font-size: 15px;
+            width: 150px;
+            height: 40px;
+        }
+
+        #searchCountries{
+            font-size: 15px;
+            width: 150;
+            height: 40px;
+        }
+
+        #refreshPage{
+            font-size: 15px;
+            width: 150;
+            height: 40px; 
+        }
+
+        .card-text{
+            color: black;
+
+        }
+
+        .h1cSs{
+            color:#3390ff;
+            padding-top: 10px;
+        }
+
+        #searchInput{
+            color: #3390ff;
+            border-color: #3390ff;
+        }
+
+    </style>
+    
+    <title>Assignment num 2 - Chen Yaacov</title>
+</head>
+<body>
+    <div class="container">
+        <form>
+                <div class = "h1cSs"><h1>Search country</h1></div>
+                <img src="https://previews.123rf.com/images/emeritus2010/emeritus20101204/emeritus2010120400010/13127770-globus-erde-weltkugel.jpg" width="70px">
+                <div class="form-group">
+                    <input type="text" id="searchInput" class="form-control" rows="3" placeholder="Search country..." >
+                    <button type="button" id="searchCountries" class="btn btn-primary my-3">Search a Country</button>
+                    <button type="button" id="showAllCountries" class="btn btn-warning my-3">Show All Contries</button>
+                    <button type="button" id="refreshPage" onClick="window.location.reload()" class="btn btn-dark my-3">Refresh Page</button>
+
+                    <hr>
+                </div>
+        </form>
+    </div>
+    <div class="container my-5">
+        <div class="row" id="countriesLoad">
+             <div class="col-sm-4 col-12">
+             </div>
+        </div>
+    </div>
+<script>
+$(function(){
+    $("body").on("click", "#showAllCountries", function () {
+        getAllFlags();
+    });
+    $("body").on("click", "#searchCountries", function () {
+        let searchInput = $("#searchInput").val();
+        flagInfo(searchInput);
+    });
+});
+
+function getAllFlags() {
+    $(function(){
+        jQuery.ajax({
+            type: "get",
+            url: 'https://restcountries.eu/rest/v2/all', dataType: "json", // url for full list of a counties
+            success: function (data) {
+                console.log(data);
+                let allCountriesString = countryCardString(data);
+                $("#countriesLoad").html(allCountriesString);
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                alert(thrownError);
+            }
+        });
+    });
+};
+
+function flagInfo(flageName){ // search by name of a country
+    $(function(){
+        jQuery.ajax({
+            type: "get",
+            url: 'https://restcountries.eu/rest/v2/name/' + flageName, // url for search any country
+            dataType: "json",
+            success: function (data) {
+                console.log(data)
+                let searchCountriesString = countryCardString(data);
+                $("#countriesLoad").html(searchCountriesString);
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                alert('Please enter any name of country');// show alert if not find a country
+            }
+        });
+    });
+};
+function countryCardString(data){
+    let tackData = '';
+    for(let i=0;i<data.length;i++){
+        tackData += `
+        <div class="col-sm-4 col-12">
+        <div class="card border-primary mb-3" style="max-width: 20rem;">
+            <div class="card-header">
+                <h2>${data[i].name}</h2>
+            </div>
+            <div class="card-body">
+                <div class="card-title">
+                    <img class="img-fluid" src=${data[i].flag}>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <p class="card-text"><b><span style="color:#0450a5">Name:</span></b>  ${data[i].name}</p>
+                        <p class="card-text"><b><span style="color:#0450a5">Population:</span></b>  ${data[i].population}</p>
+                        <p class="card-text"><b><span style="color:#0450a5">Region:</span></b>  ${data[i].region}</p>
+                        <p class="card-text"><b><span style="color:#0450a5">Borders:</span></b>  ${data[i].borders}</p>
+                        <p class="card-text"><b><span style="color:#0450a5">Dom:</span></b>  ${data[i].topLevelDomain}</p>
+                        <p class="card-text"><b><span style="color:#0450a5">Capital City:</span></b>  ${data[i].capital}</p>
+                        <p class="card-text"><b><span style="color:#0450a5">Subregion:</span></b>  ${data[i].subregion}</p>
+                        <p class="card-text"><b><span style="color:#0450a5">Currencies:</span></b>  ${data[i].currencies[0].code}  ${data[i].currencies[0].name}  ${data[i].currencies[0].symbol}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+        `;
+    };
+    return tackData;
+};
+</script>
+</body>
+</html>
